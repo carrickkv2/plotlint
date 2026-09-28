@@ -1,5 +1,7 @@
 # farm-list-check
 
+[![tests](https://github.com/carrickkv2/farm-list-check/actions/workflows/test.yml/badge.svg)](https://github.com/carrickkv2/farm-list-check/actions/workflows/test.yml)
+
 Validates EUDR farm lists before they're submitted.
 
 The EU Deforestation Regulation requires anyone placing coffee, cocoa and five other commodities on the EU market to supply the location of every farm plot the product came from, as GeoJSON. Real farm lists are messy: coordinates get swapped, precision gets lost in spreadsheets, and plots get entered twice or drawn overlapping. `farm-list-check` flags those problems per plot, with a reason code a support team can act on, and shows them on a map.
