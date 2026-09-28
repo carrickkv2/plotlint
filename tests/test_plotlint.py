@@ -15,14 +15,14 @@ import pytest
 from fastapi.testclient import TestClient
 from typer.testing import CliRunner
 
-from farm_list_check import jobs
-from farm_list_check.api import MAX_UPLOAD_BYTES, app
-from farm_list_check.cli import app as cli_app
-from farm_list_check.db import connect
-from farm_list_check.loader import load_geojson_bytes
-from farm_list_check.report import build_report
-from farm_list_check.rules import apply_feature_rules
-from farm_list_check.spatial import apply_spatial_rules
+from plotlint import jobs
+from plotlint.api import MAX_UPLOAD_BYTES, app
+from plotlint.cli import app as cli_app
+from plotlint.db import connect
+from plotlint.loader import load_geojson_bytes
+from plotlint.report import build_report
+from plotlint.rules import apply_feature_rules
+from plotlint.spatial import apply_spatial_rules
 
 # Reason codes the demo sample should produce, by feature index (see samples/README.md).
 DEMO_EXPECTED_CODES = [
@@ -226,7 +226,7 @@ def test_a_job_whose_worker_crashed_is_marked_failed_and_can_be_retried(job_ids)
 
     # Simulate a worker process dying mid-job. os._exit skips all Python cleanup, so only
     # PostgreSQL releasing the session lock tells us the worker is gone.
-    crash = ("import os, sys; from farm_list_check import jobs; "
+    crash = ("import os, sys; from plotlint import jobs; "
              "jobs.apply_feature_rules = lambda *args: os._exit(37); jobs.run_job(int(sys.argv[1]))")
     child = subprocess.run([sys.executable, "-c", crash, str(job["id"])], env=os.environ.copy(), timeout=30)
     assert child.returncode == 37

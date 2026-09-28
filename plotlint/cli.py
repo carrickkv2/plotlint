@@ -7,8 +7,8 @@ from pathlib import Path
 import typer
 import psycopg
 
-from farm_list_check.jobs import run_job, submit_job
-from farm_list_check.report import build_report, render_csv, render_json
+from plotlint.jobs import run_job, submit_job
+from plotlint.report import build_report, render_csv, render_json
 
 app = typer.Typer(no_args_is_help=True, help="Validate GeoJSON farm lists.")
 

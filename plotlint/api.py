@@ -13,9 +13,9 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, PlainTextResponse
 from pydantic import BaseModel
 
-from farm_list_check.db import create_schema
-from farm_list_check.jobs import delete_jobs_older_than, get_job, run_job, submit_job
-from farm_list_check.report import JobNotDoneError, build_report, build_result_geojson, render_csv
+from plotlint.db import create_schema
+from plotlint.jobs import delete_jobs_older_than, get_job, run_job, submit_job
+from plotlint.report import JobNotDoneError, build_report, build_result_geojson, render_csv
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="farm-list-check", description="Validate EUDR farm lists (GeoJSON).", lifespan=lifespan)
+app = FastAPI(title="plotlint", description="Validate EUDR farm lists (GeoJSON).", lifespan=lifespan)
 
 
 # ---------- response models ----------

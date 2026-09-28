@@ -8,8 +8,8 @@ from collections import Counter
 from io import StringIO
 from typing import Any
 
-from farm_list_check.db import connect
-from farm_list_check.jobs import get_job
+from plotlint.db import connect
+from plotlint.jobs import get_job
 
 
 class JobNotDoneError(RuntimeError):

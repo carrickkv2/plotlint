@@ -7,10 +7,10 @@ from typing import Any
 
 from psycopg.rows import dict_row
 
-from farm_list_check.db import connect
-from farm_list_check.loader import load_geojson_bytes
-from farm_list_check.rules import apply_feature_rules
-from farm_list_check.spatial import apply_spatial_rules
+from plotlint.db import connect
+from plotlint.loader import load_geojson_bytes
+from plotlint.rules import apply_feature_rules
+from plotlint.spatial import apply_spatial_rules
 
 MAX_ATTEMPTS = 3
 

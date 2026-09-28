@@ -1,10 +1,10 @@
-# farm-list-check
+# plotlint
 
-[![tests](https://github.com/carrickkv2/farm-list-check/actions/workflows/test.yml/badge.svg)](https://github.com/carrickkv2/farm-list-check/actions/workflows/test.yml)
+[![tests](https://github.com/carrickkv2/plotlint/actions/workflows/test.yml/badge.svg)](https://github.com/carrickkv2/plotlint/actions/workflows/test.yml)
 
-Validates EUDR farm lists before they're submitted.
+A linter for EUDR farm plot data: it catches the mistakes that would get a farm list rejected, before the list is used to prove products are deforestation-free.
 
-The EU Deforestation Regulation requires anyone placing coffee, cocoa and five other commodities on the EU market to supply the location of every farm plot the product came from, as GeoJSON. Real farm lists are messy: coordinates get swapped, precision gets lost in spreadsheets, and plots get entered twice or drawn overlapping. `farm-list-check` flags those problems per plot, with a reason code a support team can act on, and shows them on a map.
+The EU Deforestation Regulation requires anyone placing coffee, cocoa and five other commodities on the EU market to supply the location of every farm plot the product came from, as GeoJSON. Real farm lists are messy: coordinates get swapped, precision gets lost in spreadsheets, and plots get entered twice or drawn overlapping. `plotlint` flags those problems per plot, with a reason code a support team can act on, and shows them on a map.
 
 ![Map of a validated farm list: valid plots in green, invalid in red, overlapping plots in orange](docs/map.png)
 
@@ -20,9 +20,9 @@ The same thing from the command line (Python 3.12, with the database from `docke
 
 ```sh
 pip install -e ".[test]"
-farm-list-check submit samples/demo.geojson     # prints a job id
-farm-list-check run <job_id>
-farm-list-check report <job_id> --format csv
+plotlint submit samples/demo.geojson     # prints a job id
+plotlint run <job_id>
+plotlint report <job_id> --format csv
 ```
 
 Or over HTTP:
@@ -85,7 +85,7 @@ The code reads top to bottom: `loader.py` → `rules.py` → `spatial.py` → `j
 ## Project layout
 
 ```
-farm_list_check/
+plotlint/
   loader.py       read the GeoJSON, keep each coordinate's raw text
   rules.py        per-plot rules
   spatial.py      PostGIS rules
