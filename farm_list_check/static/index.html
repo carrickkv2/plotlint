@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>farm-list-check</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    body { margin: 0; display: flex; height: 100vh; font: 14px/1.4 system-ui, sans-serif; color: #222; }
+    #sidebar { width: 340px; padding: 16px; overflow-y: auto; border-right: 1px solid #ddd; box-sizing: border-box; }
+    #map { flex: 1; }
+    h1 { font-size: 18px; margin: 0 0 12px; }
+    h2 { font-size: 14px; margin: 16px 0 6px; }
+    .row { display: flex; gap: 6px; margin-bottom: 8px; }
+    input[type=number] { width: 90px; }
+    #status { color: #555; min-height: 20px; }
+    .error { color: #c62828; }
+    table { border-collapse: collapse; width: 100%; }
+    td { padding: 2px 4px; border-bottom: 1px solid #eee; }
+    .legend span { display: inline-block; width: 12px; height: 12px; margin-right: 4px; vertical-align: -1px; }
+    .flagged { cursor: pointer; padding: 4px 0; border-bottom: 1px solid #eee; }
+    .flagged:hover { background: #f5f5f5; }
+    .codes { font-family: monospace; font-size: 12px; color: #c62828; }
+  </style>
+</head>
+<body>
+  <div id="sidebar">
+    <h1>farm-list-check</h1>
+    <div class="row"><input type="file" id="file" accept=".geojson,.json"></div>
+    <div class="row">
+      <input type="number" id="job-id" placeholder="job id" min="1">
+      <button id="load-job">Load job</button>
+    </div>
+    <div id="status"></div>
+    <div class="legend">
+      <span style="background:#2e7d32"></span>valid
+      <span style="background:#c62828; margin-left:10px"></span>invalid
+      <span style="background:#ef6c00; margin-left:10px"></span>overlapping
+    </div>
+    <h2>Summary</h2>
+    <table id="summary"></table>
+    <h2>Flagged farms</h2>
+    <div id="flagged"></div>
+  </div>
+  <div id="map"></div>
+
+  <script>
+    const COLORS = { valid: "#2e7d32", invalid: "#c62828", overlap: "#ef6c00" };
+
+    const map = L.map("map").setView([-1.1, 36.82], 13);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "&copy; OpenStreetMap contributors",
+    }).addTo(map);
+    let farmsLayer = L.layerGroup().addTo(map);
+
+    const $ = (id) => document.getElementById(id);
+    const esc = (text) => String(text ?? "").replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+    const setStatus = (text, isError = false) => {
+      $("status").textContent = text;
+      $("status").className = isError ? "error" : "";
+    };
+
+    // Upload a file: POST it as the raw body, then wait for the job and draw it.
+    $("file").addEventListener("change", async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      setStatus(`Uploading ${file.name}…`);
+      const response = await fetch("/farm-lists", { method: "POST", body: await file.text() });
+      const body = await response.json();
+      if (!response.ok) return setStatus(body.detail, true);
+      await showJob(body.job_id);
+    });
+
+    $("load-job").addEventListener("click", () => showJob(Number($("job-id").value)));
+
+    async function showJob(jobId) {
+      $("job-id").value = jobId;
+      history.replaceState(null, "", `?job=${jobId}`);  // so the page can be reloaded or shared
+
+      const job = await waitUntilFinished(jobId);
+      if (!job) return;
+      if (job.status === "failed") return setStatus(`Job ${jobId} failed: ${job.error}`, true);
+
+      const result = await (await fetch(`/jobs/${jobId}/geojson`)).json();
+      setStatus(`Job ${jobId}: done`);
+      drawFarms(result.features);
+      showSummary(result.summary);
+    }
+
+    async function waitUntilFinished(jobId) {
+      for (let attempt = 0; attempt < 60; attempt++) {
+        const response = await fetch(`/jobs/${jobId}`);
+        const job = await response.json();
+        if (!response.ok) return setStatus(job.detail, true);
+        if (job.status === "done" || job.status === "failed") return job;
+        setStatus(`Job ${jobId}: ${job.status}…`);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+      setStatus(`Job ${jobId} is still running; try "Load job" again shortly.`, true);
+    }
+
+    function drawFarms(features) {
+      farmsLayer.clearLayers();
+      $("flagged").innerHTML = "";
+      const drawn = L.featureGroup();
+
+      features.forEach((feature, index) => {
+        const { farm_id, valid, codes, messages } = feature.properties;
+        const layer = canDraw(feature.geometry) ? toLayer(feature, colorFor(valid, codes)) : null;
+
+        if (layer) {
+          layer.bindPopup(
+            `<b>${esc(farm_id || "(no farm_id)")}</b> · feature ${index}<br>` +
+            (valid ? "valid" : `<span class="codes">${codes.map(esc).join(", ")}</span><br>${messages.map(esc).join("<br>")}`)
+          );
+          layer.addTo(drawn);
+        }
+        if (!valid) addFlaggedRow(index, farm_id, codes, layer);
+      });
+
+      drawn.addTo(farmsLayer);
+      if (drawn.getLayers().length) map.fitBounds(drawn.getBounds(), { padding: [30, 30] });
+    }
+
+    // Leaflet can draw points, lines and polygons, but only with real latitudes (swapped
+    // coordinates like [-1.1, 100] would be drawn off the map and zoom it out to the whole world).
+    function canDraw(geometry) {
+      if (!geometry || !["Point", "LineString", "Polygon"].includes(geometry.type)) return false;
+      const flat = [geometry.coordinates].flat(3);
+      for (let i = 1; i < flat.length; i += 2) if (Math.abs(flat[i]) > 90) return false;
+      return true;
+    }
+
+    function toLayer(feature, color) {
+      return L.geoJSON(feature, {
+        style: { color, weight: 2, fillOpacity: 0.35 },
+        pointToLayer: (_, latlng) => L.circleMarker(latlng, { radius: 7, color, fillOpacity: 0.8 }),
+      });
+    }
+
+    function colorFor(valid, codes) {
+      if (valid) return COLORS.valid;
+      return codes.includes("OVERLAPPING_PLOTS") ? COLORS.overlap : COLORS.invalid;
+    }
+
+    function addFlaggedRow(index, farmId, codes, layer) {
+      const row = document.createElement("div");
+      row.className = "flagged";
+      row.innerHTML =
+        `<b>${esc(farmId || "(no farm_id)")}</b> · feature ${index}` +
+        `<div class="codes">${codes.map(esc).join(", ")}</div>` +
+        (layer ? "" : "<i>not drawn: geometry can't be placed on the map</i>");
+      if (layer) row.onclick = () => { map.fitBounds(layer.getBounds(), { maxZoom: 17 }); layer.openPopup(); };
+      $("flagged").appendChild(row);
+    }
+
+    function showSummary(summary) {
+      const rows = [["Total", summary.total], ["Valid", summary.valid], ["Invalid", summary.invalid],
+        ...Object.entries(summary.counts_by_code)];
+      $("summary").innerHTML = rows.map(([name, count]) => `<tr><td>${esc(name)}</td><td>${count}</td></tr>`).join("");
+    }
+
+    // Open ?job=123 directly.
+    const jobFromUrl = new URLSearchParams(location.search).get("job");
+    if (jobFromUrl) showJob(Number(jobFromUrl));
+  </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "type": "FeatureCollection",
+  "name": "Valid Kiambu demo list (synthetic)",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-V001", "producer": "Demo producer", "area_ha": 1.2},
+      "geometry": {"type": "Point", "coordinates": [36.819500, -1.107200]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-V002", "producer": "Demo producer", "area_ha": 4.8},
+      "geometry": {"type": "Polygon", "coordinates": [[[36.830000, -1.115000], [36.832000, -1.115000], [36.832000, -1.113000], [36.830000, -1.113000], [36.830000, -1.115000]]]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-V003"},
+      "geometry": {"type": "Point", "coordinates": [36.845000, -1.140000]}
+    }
+  ]
+}

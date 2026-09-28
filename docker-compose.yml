@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: farm_lists
+      POSTGRES_USER: farm_lists
+      POSTGRES_PASSWORD: farm_lists
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U farm_lists -d farm_lists"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://farm_lists:farm_lists@db:5432/farm_lists
+    ports:
+      - "8000:8000"
+    command: ["uvicorn", "farm_list_check.api:app", "--host", "0.0.0.0", "--port", "8000"]
+
+volumes:
+  postgres_data:

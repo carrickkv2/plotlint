@@ -1,0 +1,81 @@
+{
+  "type": "FeatureCollection",
+  "name": "Kiambu demo list (synthetic)",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-001", "producer": "Demo producer"},
+      "geometry": {"type": "Point", "coordinates": [36.821900, -1.102300]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"producer": "Missing identifier example"},
+      "geometry": {"type": "Point", "coordinates": [36.822100, -1.102500]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-003"},
+      "geometry": {"type": "LineString", "coordinates": [[36.823000, -1.103000], [36.823500, -1.103500]]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-004"},
+      "geometry": {"type": "Point", "coordinates": [36.82, -1.10]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "SYN-SWAPPED-005"},
+      "geometry": {"type": "Point", "coordinates": [-1.100000, 100.000000]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-006", "area_ha": 4.5},
+      "geometry": {"type": "Point", "coordinates": [36.824000, -1.104000]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-007"},
+      "geometry": {"type": "Polygon", "coordinates": [[[36.810000, -1.110000], [36.811000, -1.110000], [36.811000, -1.111000], [36.810000, -1.111000]]]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-008"},
+      "geometry": {"type": "Polygon", "coordinates": [[[36.812000, -1.110000], [36.813000, -1.110000], [36.812500, -1.111000], [36.812000, -1.110000]]]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-009"},
+      "geometry": {"type": "Polygon", "coordinates": [[[36.814000, -1.110000], [36.816000, -1.112000], [36.814000, -1.112000], [36.816000, -1.110000], [36.814000, -1.110000]]]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-010", "area_ha": 10.0},
+      "geometry": {"type": "Polygon", "coordinates": [[[36.818000, -1.118000], [36.818900, -1.118000], [36.818900, -1.118900], [36.818000, -1.118900], [36.818000, -1.118000]]]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-011"},
+      "geometry": {"type": "Point", "coordinates": [36.821900, -1.102300]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-012", "area_ha": 4.9},
+      "geometry": {"type": "Polygon", "coordinates": [[[36.825000, -1.125000], [36.827000, -1.125000], [36.827000, -1.123000], [36.825000, -1.123000], [36.825000, -1.125000]]]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-013", "area_ha": 4.9},
+      "geometry": {"type": "Polygon", "coordinates": [[[36.826000, -1.125000], [36.828000, -1.125000], [36.828000, -1.123000], [36.826000, -1.123000], [36.826000, -1.125000]]]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-014", "area_ha": 4.9},
+      "geometry": {"type": "Polygon", "coordinates": [[[36.835000, -1.125000], [36.837000, -1.125000], [36.837000, -1.123000], [36.835000, -1.123000], [36.835000, -1.125000]]]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-015"},
+      "geometry": {"type": "Point", "coordinates": [36.840000, -1.130000]}
+    }
+  ]
+}

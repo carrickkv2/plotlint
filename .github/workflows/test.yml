@@ -1,0 +1,43 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_DB: farm_lists
+          POSTGRES_USER: farm_lists
+          POSTGRES_PASSWORD: farm_lists
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U farm_lists -d farm_lists"
+          --health-interval 3s
+          --health-timeout 3s
+          --health-retries 20
+
+    env:
+      DATABASE_URL: postgresql://farm_lists:farm_lists@localhost:5432/farm_lists
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: pip install -e ".[test]"
+
+      - name: Create the schema
+        run: psql "$DATABASE_URL" -f sql/001_init.sql
+
+      - name: Run tests
+        run: pytest -v
