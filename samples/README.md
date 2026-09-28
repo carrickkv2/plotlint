@@ -2,7 +2,7 @@
 
 Both files use fictional farms and coordinates near Kiambu, Kenya. They are synthetic teaching data, not surveyed farm boundaries or evidence about real producers. The demo's `SYN-SWAPPED-005` point is deliberately outside Kenya: `[longitude, latitude]` is `[-1.100000, 100.000000]`, so latitude is outside ±90 while swapping the pair would make both values numerically valid. A coordinate swap near the equator can remain numerically legal and cannot be detected by this rule alone.
 
-`demo.geojson` has 15 features, indexed from zero in file order. Expected rule coverage:
+`demo.geojson` has 23 features, indexed from zero in file order: 13 each carry one planted mistake and 10 are valid, so the demo looks like a real list (mostly fine, with some problems). Expected rule coverage:
 
 | Index | Farm ID | Expected reason code(s) |
 |---:|---|---|
@@ -21,6 +21,8 @@ Both files use fictional farms and coordinates near Kiambu, Kenya. They are synt
 | 12 | KMB-013 | `OVERLAPPING_PLOTS` (overlaps feature 11) |
 | 13 | KMB-014 | none |
 | 14 | KMB-015 | none |
+| 15–19 | KMB-016 to KMB-020 | none (irregular 5–6 corner farms, 1.3–3.3 ha, declared areas match their measured areas) |
+| 20–22 | KMB-021 to KMB-023 | none (points for farms of 4 ha or less) |
 
 The three-distinct-vertex triangle at index 7 is accepted by PostGIS `ST_IsValid`; the app's requested minimum is four distinct vertices, so `POLYGON_TOO_FEW_VERTICES` is an independent rule. `ST_IsValid` checks polygon topology, and `ST_IsValidReason` supplies the readable cause when that check fails. The bowtie at index 8 reports `Self-intersection[36.815 -1.111]`.
 

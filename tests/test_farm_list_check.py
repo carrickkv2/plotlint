@@ -41,6 +41,14 @@ DEMO_EXPECTED_CODES = [
     ["OVERLAPPING_PLOTS"],
     [],
     [],
+    [],  # KMB-016 to KMB-023: valid farms
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
 ]
 
 
@@ -72,7 +80,7 @@ def test_demo_file_produces_the_expected_reason_codes(job_ids):
 
     report = build_report(job["id"])
     assert [result["codes"] for result in report["results"]] == DEMO_EXPECTED_CODES
-    assert report["summary"]["valid"] == 2
+    assert report["summary"]["valid"] == 10
     assert report["summary"]["invalid"] == 13
 
 
@@ -244,11 +252,11 @@ def test_cli_submit_run_and_report(job_ids, tmp_path):
     assert runner.invoke(cli_app, ["run", str(job_id)]).exit_code == 0
 
     as_json = runner.invoke(cli_app, ["report", str(job_id), "--format", "json"])
-    assert json.loads(as_json.output)["summary"]["total"] == 15
+    assert json.loads(as_json.output)["summary"]["total"] == 23
 
     as_csv = runner.invoke(cli_app, ["report", str(job_id), "--format", "csv"])
     rows = list(csv.DictReader(StringIO(as_csv.output)))
-    assert len([row for row in rows if row["row_type"] == "feature"]) == 15
+    assert len([row for row in rows if row["row_type"] == "feature"]) == 23
     assert rows[-1]["row_type"] == "summary"
 
     # Errors: bad option → exit 2, missing job → exit 1, malformed file → exit 2.
@@ -269,7 +277,7 @@ def test_api_upload_to_report(job_ids):
     job_ids.append(job_id)
 
     assert client.get(f"/jobs/{job_id}").json()["status"] == "done"
-    assert client.get(f"/jobs/{job_id}/report").json()["summary"]["total"] == 15
+    assert client.get(f"/jobs/{job_id}/report").json()["summary"]["total"] == 23
     assert client.get(f"/jobs/{job_id}/report?format=csv").headers["content-type"].startswith("text/csv")
     assert client.get(f"/jobs/{job_id}/geojson").json()["features"][11]["properties"]["codes"] == ["OVERLAPPING_PLOTS"]
 

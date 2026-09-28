@@ -76,6 +76,46 @@
       "type": "Feature",
       "properties": {"farm_id": "KMB-015"},
       "geometry": {"type": "Point", "coordinates": [36.840000, -1.130000]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-016", "producer": "Demo producer", "area_ha": 2.6},
+      "geometry": {"type": "Polygon", "coordinates": [[[36.845000, -1.108000], [36.846400, -1.107800], [36.846700, -1.108900], [36.845800, -1.109400], [36.844800, -1.108800], [36.845000, -1.108000]]]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-017", "producer": "Demo producer", "area_ha": 3.3},
+      "geometry": {"type": "Polygon", "coordinates": [[[36.851000, -1.113000], [36.852100, -1.112700], [36.852900, -1.113400], [36.852600, -1.114300], [36.851500, -1.114500], [36.850700, -1.113700], [36.851000, -1.113000]]]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-018", "producer": "Demo producer", "area_ha": 1.3},
+      "geometry": {"type": "Polygon", "coordinates": [[[36.857000, -1.119000], [36.857900, -1.118900], [36.858200, -1.119700], [36.857600, -1.120100], [36.856900, -1.119600], [36.857000, -1.119000]]]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-019", "producer": "Demo producer", "area_ha": 2.8},
+      "geometry": {"type": "Polygon", "coordinates": [[[36.846000, -1.127000], [36.847600, -1.127000], [36.847800, -1.128000], [36.847000, -1.128600], [36.846100, -1.128200], [36.846000, -1.127000]]]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-020", "producer": "Demo producer", "area_ha": 3.2},
+      "geometry": {"type": "Polygon", "coordinates": [[[36.862000, -1.131000], [36.863300, -1.130600], [36.864000, -1.131500], [36.863400, -1.132400], [36.862300, -1.132200], [36.861800, -1.131500], [36.862000, -1.131000]]]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-021", "producer": "Demo producer", "area_ha": 1.2},
+      "geometry": {"type": "Point", "coordinates": [36.853000, -1.124000]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-022", "producer": "Demo producer", "area_ha": 0.8},
+      "geometry": {"type": "Point", "coordinates": [36.859000, -1.109000]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"farm_id": "KMB-023", "producer": "Demo producer", "area_ha": 2.5},
+      "geometry": {"type": "Point", "coordinates": [36.867000, -1.121000]}
     }
   ]
 }

@@ -19,9 +19,10 @@
     table { border-collapse: collapse; width: 100%; }
     td { padding: 2px 4px; border-bottom: 1px solid #eee; }
     .legend span { display: inline-block; width: 12px; height: 12px; margin-right: 4px; vertical-align: -1px; }
-    .flagged { cursor: pointer; padding: 4px 0; border-bottom: 1px solid #eee; }
-    .flagged:hover { background: #f5f5f5; }
+    .farm { cursor: pointer; padding: 4px 0; border-bottom: 1px solid #eee; }
+    .farm:hover { background: #f5f5f5; }
     .codes { font-family: monospace; font-size: 12px; color: #c62828; }
+    #valid .farm b { color: #2e7d32; }
   </style>
 </head>
 <body>
@@ -42,6 +43,8 @@
     <table id="summary"></table>
     <h2>Flagged farms</h2>
     <div id="flagged"></div>
+    <h2>Valid farms</h2>
+    <div id="valid"></div>
   </div>
   <div id="map"></div>
 
@@ -104,6 +107,7 @@
     function drawFarms(features) {
       farmsLayer.clearLayers();
       $("flagged").innerHTML = "";
+      $("valid").innerHTML = "";
       const drawn = L.featureGroup();
 
       features.forEach((feature, index) => {
@@ -117,7 +121,7 @@
           );
           layer.addTo(drawn);
         }
-        if (!valid) addFlaggedRow(index, farm_id, codes, layer);
+        addFarmRow(valid ? "valid" : "flagged", index, farm_id, codes, layer);
       });
 
       drawn.addTo(farmsLayer);
@@ -145,15 +149,16 @@
       return codes.includes("OVERLAPPING_PLOTS") ? COLORS.overlap : COLORS.invalid;
     }
 
-    function addFlaggedRow(index, farmId, codes, layer) {
+    // One clickable row in the "flagged" or "valid" list; clicking zooms to the farm.
+    function addFarmRow(listId, index, farmId, codes, layer) {
       const row = document.createElement("div");
-      row.className = "flagged";
+      row.className = "farm";
       row.innerHTML =
         `<b>${esc(farmId || "(no farm_id)")}</b> · feature ${index}` +
-        `<div class="codes">${codes.map(esc).join(", ")}</div>` +
+        (codes.length ? `<div class="codes">${codes.map(esc).join(", ")}</div>` : "") +
         (layer ? "" : "<i>not drawn: geometry can't be placed on the map</i>");
       if (layer) row.onclick = () => { map.fitBounds(layer.getBounds(), { maxZoom: 17 }); layer.openPopup(); };
-      $("flagged").appendChild(row);
+      $(listId).appendChild(row);
     }
 
     function showSummary(summary) {

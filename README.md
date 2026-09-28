@@ -14,7 +14,7 @@ The EU Deforestation Regulation requires anyone placing coffee, cocoa and five o
 docker compose up --build
 ```
 
-Open http://localhost:8000 and upload `samples/demo.geojson`: 15 plots near Kiambu, Kenya, with one of every error planted on purpose.
+Open http://localhost:8000 and upload `samples/demo.geojson`: 23 plots near Kiambu, Kenya. 10 are valid and 13 each have one mistake planted on purpose, one of every error type.
 
 The same thing from the command line (Python 3.12, with the database from `docker compose up` running):
 
