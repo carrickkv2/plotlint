@@ -16,7 +16,7 @@ from fastapi.testclient import TestClient
 from typer.testing import CliRunner
 
 from farm_list_check import jobs
-from farm_list_check.api import app
+from farm_list_check.api import MAX_UPLOAD_BYTES, app
 from farm_list_check.cli import app as cli_app
 from farm_list_check.db import connect
 from farm_list_check.loader import load_geojson_bytes
@@ -274,4 +274,5 @@ def test_api_upload_to_report(job_ids):
     assert client.get(f"/jobs/{job_id}/geojson").json()["features"][11]["properties"]["codes"] == ["OVERLAPPING_PLOTS"]
 
     assert client.post("/farm-lists", content=b"{}").status_code == 422
+    assert client.post("/farm-lists", content=b" " * (MAX_UPLOAD_BYTES + 1)).status_code == 413
     assert client.get("/jobs/999999999").status_code == 404

@@ -25,7 +25,6 @@ services:
       DATABASE_URL: postgresql://farm_lists:farm_lists@db:5432/farm_lists
     ports:
       - "8000:8000"
-    command: ["uvicorn", "farm_list_check.api:app", "--host", "0.0.0.0", "--port", "8000"]
 
 volumes:
   postgres_data:

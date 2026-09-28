@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Literal
@@ -12,12 +13,24 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, PlainTextResponse
 from pydantic import BaseModel
 
-from farm_list_check.jobs import get_job, run_job, submit_job
+from farm_list_check.db import create_schema
+from farm_list_check.jobs import delete_jobs_older_than, get_job, run_job, submit_job
 from farm_list_check.report import JobNotDoneError, build_report, build_result_geojson, render_csv
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="farm-list-check", description="Validate EUDR farm lists (GeoJSON).")
+# Limits for a public demo: anyone can upload, so keep files small and jobs short-lived.
+MAX_UPLOAD_BYTES = 2_000_000
+KEEP_JOBS_FOR_DAYS = 7
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    create_schema()  # a fresh database (e.g. on Railway) gets its tables on first start
+    yield
+
+
+app = FastAPI(title="farm-list-check", description="Validate EUDR farm lists (GeoJSON).", lifespan=lifespan)
 
 
 # ---------- response models ----------
@@ -75,9 +88,15 @@ def map_page() -> FileResponse:
 @app.post("/farm-lists", status_code=202, response_model=SubmittedJob)
 async def submit_farm_list(request: Request, background_tasks: BackgroundTasks) -> SubmittedJob:
     """Upload a GeoJSON FeatureCollection as the raw request body. The same file returns the same job."""
+    if int(request.headers.get("content-length") or 0) > MAX_UPLOAD_BYTES:
+        raise HTTPException(413, f"Farm lists are limited to {MAX_UPLOAD_BYTES:,} bytes")
     raw = await request.body()
+    if len(raw) > MAX_UPLOAD_BYTES:  # the header can be missing or wrong
+        raise HTTPException(413, f"Farm lists are limited to {MAX_UPLOAD_BYTES:,} bytes")
     if not raw:
         raise HTTPException(422, "Request body must be a GeoJSON FeatureCollection")
+
+    await run_in_threadpool(delete_jobs_older_than, KEEP_JOBS_FOR_DAYS)
     try:
         # submit_job does blocking database I/O, so run it off the event loop.
         job = await run_in_threadpool(submit_job, raw)

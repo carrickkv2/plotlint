@@ -92,6 +92,12 @@ def get_job(job_id: int) -> dict[str, Any]:
                 return _job_from_cursor(cursor, job_id)
 
 
+def delete_jobs_older_than(days: int) -> None:
+    """Delete old jobs (their results go with them via ON DELETE CASCADE)."""
+    with connect() as conn:
+        conn.execute("DELETE FROM jobs WHERE created_at < now() - make_interval(days => %s)", (days,))
+
+
 def run_job(job_id: int) -> dict[str, Any]:
     """Run one validation attempt for a queued or failed job.
 
